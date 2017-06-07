@@ -118,7 +118,7 @@ public class Train implements Runnable{
                     //System.err.println("accelerate....");
                 }
                 position.x = (position.x + (timeCounter*2)) % 588;
-                System.out.println(position.x);
+                //System.out.println(position.x);
                 timeCounter++;
                 
                 if (timeCounter >= nextStation.getDistance()) {
