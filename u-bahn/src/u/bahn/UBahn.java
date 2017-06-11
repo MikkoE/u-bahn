@@ -8,24 +8,24 @@ package u.bahn;
 import helper.StationList;
 import defines.Station;
 import helper.Train;
+import helper.TrainImage;
 import javafx.animation.AnimationTimer;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
+import javafx.animation.PathTransition;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Group;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.effect.Lighting;
+import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -35,98 +35,71 @@ import javafx.util.Duration;
  */
 public class UBahn extends Application {
     
+    public static final int HEIGHT = 750;
+    public static final int WIDTH = 550;
+    
     public StationList stationList = new StationList();
     Train train1;
     
-    private Integer i = 0;
-    
-    private Timeline timeline;
-    private AnimationTimer timer;
+    public Image image = new Image("image/u-bahnFront.png");
+    public TrainImage v_image = new TrainImage(image);
     
     @Override
-    public void start(Stage primaryStage) {        
+    public void start(Stage primaryStage) {  
+                
         Station startStation = new Station("1", 0, 10, false);
-        
         initStations(startStation);
         initTrains(startStation);
+        
+        
+        v_image.setImage(image);
+        v_image.setFitWidth(50);
+        v_image.setPreserveRatio(true);
+        v_image.setSmooth(true);
+        v_image.setCache(true);
+        v_image.setLayoutX(300);
+        v_image.setLayoutY(300);
+        
+        /*Path p = new Path();
+        p.getElements().add(new MoveTo(train1.getPosition().x, 0));
+        p.getElements().add(new LineTo(train1.getPosition().x + train1.getCurrentStation().getDistance(), 0));
+        PathTransition pt = new PathTransition(Duration.millis(10000), p);
+        pt.setNode(v_image);
+        
+        DoubleProperty xValue = new SimpleDoubleProperty();
+        xValue.bind(v_image.translateXProperty());
+        xValue.addListener(new ChangeListener() {
 
-         
-        //create a circle with effect
-        final Circle circle = new Circle(20,  Color.rgb(156,216,255));
-        circle.setEffect(new Lighting());
-        //create a text inside a circle
-        final Text text = new Text (i.toString());
-        text.setStroke(Color.BLACK);
-        //create a layout for circle with text inside
-        final StackPane stack = new StackPane();
-        stack.getChildren().addAll(circle, text);
-        stack.setLayoutX(30);
-        stack.setLayoutY(30);
- 
-        //create a timeline for moving the circle
-        timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.setAutoReverse(true);
- 
+            @Override
+            public void changed(ObservableValue ov, Object oldValue, Object newValue) {
+             //   System.out.println((double) t1);
+            }
+        });*/
         
-        
-        //Canvas canvas = new Canvas(700, 500);
-        //GraphicsContext gc = canvas.getGraphicsContext2D();
-        //drawing(gc);
-            
+
+
+ 
         StackPane root = new StackPane();
-        //root.getChildren().add(canvas);
-        root.getChildren().add(stack);
         
-        root.setTranslateX(80);
-        root.setTranslateY(80);
+        HBox box = new HBox();
+        box.getChildren().add(v_image);
+        root.getChildren().add(v_image);
+        
+        root.setTranslateX(-HEIGHT);
+        root.setTranslateY(-WIDTH + (image.getWidth()/4));
         
         //Scene scene = new Scene(root, 1920, 1080);
-        Scene scene = new Scene(root, 750, 550);
+        Scene scene = new Scene(root, HEIGHT, WIDTH);
         
         primaryStage.setTitle("U-Bahn Linie");
+        //pt.play();
         primaryStage.setScene(scene);
-        primaryStage.show();
-        
-        
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long l) {
-                //System.err.println(train1.getPosition());
-                text.setText(i.toString());
-                //i++;
-            }
- 
-        };
-        
-         //create a keyValue with factory: scaling the circle 2times
-        KeyValue keyValueX = new KeyValue(stack.scaleXProperty(), 2);
-        KeyValue keyValueY = new KeyValue(stack.scaleYProperty(), 2);
- 
-        //create a keyFrame, the keyValue is reached at time 2s
-        Duration duration = Duration.millis(2000);
-        //one can add a specific action when the keyframe is reached
-        EventHandler onFinished = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent t) {
-                 stack.setTranslateX(train1.getPosition().x);
-                 //reset counter
-                 //i = 0;
-            }
-        };
- 
-        KeyFrame keyFrame = new KeyFrame(duration, onFinished , keyValueX, keyValueY);
- 
-        //add the keyframe to the timeline
-        timeline.getKeyFrames().add(keyFrame);
- 
-        timeline.play();
-        timer.start();
-    
+        primaryStage.show();    
     }
 
     private void initTrains(Station startStation) {
-        train1 = new Train(0, startStation, stationList);
-        new Thread(train1).start();
+        //train1 = new Train(0, startStation, stationList);
+        //new Thread(train1).start();
         //new Thread(new Train(1, startStation, stationList)).start();        
         
     }

@@ -18,17 +18,19 @@ import java.util.logging.Logger;
  */
 public class Train implements Runnable{
     
-    public static final int TICK = 500;
-    public static final int DRIVINGSPEED = 10;
-    public static final int DRIVINGTIME = 15;
-    public static final int STOPTIME = 5;
+    public static final int TICK = 250;
+    public static final int DRIVINGSPEED = 20;
+    public static final int DRIVINGTIME = 25;
+    public static final int STOPTIME = 10;
     
     private boolean broken;
     private int trainNumber;
     private Station currentStation;
     private Station nextStation;
     private double currentSpeed;
-    private Logger logger;
+    
+    //counter für die strecke der bahn
+    int timeCounter;
     
     //position des Zuges
     private TrainPosition position;
@@ -51,14 +53,11 @@ public class Train implements Runnable{
         broken = false;
         position = new TrainPosition(1, 1);
         currentSpeed = 0;
-        logger = Logger.getLogger("Zug");
         state = State.TrainState.STOP;
         this.stationList = stationList;
         nextStation = stationList.getNextStation(currentStation);
     }
-    
-    
-    
+     
     public boolean getBroken(){
         return broken;
     }
@@ -75,8 +74,6 @@ public class Train implements Runnable{
         this.trainNumber = trainNumber;
     }
     
-    
-
     public double getCurrentSpeed() {
         return currentSpeed;
     }
@@ -97,6 +94,12 @@ public class Train implements Runnable{
     public void setPosition(TrainPosition position) {
         this.position = position;
     }
+
+    public Station getCurrentStation() {
+        return currentStation;
+    }
+    
+    
     
     
     
@@ -105,7 +108,7 @@ public class Train implements Runnable{
 
     @Override
     public void run() {
-        int timeCounter = 0;
+        timeCounter = 0;
         
         //hier wird das verhalten eines zuges abgebildet 
         while (true) {
@@ -117,8 +120,8 @@ public class Train implements Runnable{
                     accelerate();
                     //System.err.println("accelerate....");
                 }
-                position.x = (position.x + (timeCounter*2)) % 588;
-                //System.out.println(position.x);
+                position.x = (position.x + (timeCounter)) % 588;
+                System.out.println(position.x);
                 timeCounter++;
                 
                 if (timeCounter >= nextStation.getDistance()) {
@@ -131,10 +134,6 @@ public class Train implements Runnable{
                        state = State.TrainState.STOP;
                         System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
                     }
-                    
-                     
-                    
-                    
                 }
                 
                 break;
@@ -169,6 +168,9 @@ public class Train implements Runnable{
             } catch (InterruptedException ex) {
                 Logger.getLogger(Train.class.getName()).log(Level.SEVERE, null, ex);
             } 
+        }
+        if(stationList.getIndexOf(nextStation) == 1){
+            timeCounter = 0;
         }
         currentStation.setHasTrain(false);
         currentStation = nextStation;

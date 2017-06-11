@@ -26,6 +26,7 @@ public class StationList {
     
     public Station getNextStation(Station currentStation){
         if (stationList.indexOf(currentStation)+1 >= stationList.size()){
+            
             return stationList.get(0);
         }else{
            return stationList.get(stationList.indexOf(currentStation)+1); 
@@ -37,6 +38,9 @@ public class StationList {
         return stationList;
     }
     
+    public int getIndexOf(Station station){
+        return stationList.indexOf(station);
+    }    
     
     
     
