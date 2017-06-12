@@ -30,7 +30,7 @@ public class TrainImage extends ImageView{
 
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                train.getPosition().x;
+                //train.getPosition().x;
             }
         });
         

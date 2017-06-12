@@ -9,6 +9,9 @@ import defines.TrainPosition;
 import defines.Station;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  *
@@ -27,7 +30,14 @@ public class Train implements Runnable{
     private int trainNumber;
     private Station currentStation;
     private Station nextStation;
+    private int currentStationNum;
     private double currentSpeed;
+    
+    //variablen für die anzeige
+    private final SimpleIntegerProperty trainNumTab;
+    private final SimpleIntegerProperty stationNumTab;
+    private final SimpleDoubleProperty speedTab;
+    private final SimpleStringProperty brokenTab;
     
     //counter für die strecke der bahn
     int timeCounter;
@@ -40,6 +50,9 @@ public class Train implements Runnable{
     // Enum for train states (station/stop and driving
     State.TrainState state;
     
+    private volatile boolean running = true;
+
+    
     
     /**
      * 
@@ -50,12 +63,19 @@ public class Train implements Runnable{
     public Train(int number, Station currentStation, StationList stationList){
         trainNumber = number;
         this.currentStation = currentStation;
+        this.currentStationNum = currentStation.getPosition();
         broken = false;
         position = new TrainPosition(1, 1);
         currentSpeed = 0;
         state = State.TrainState.STOP;
         this.stationList = stationList;
-        nextStation = stationList.getNextStation(currentStation);
+        
+        //anzeige
+        this.trainNumTab =  new SimpleIntegerProperty(trainNumber);
+        this.stationNumTab =  new SimpleIntegerProperty(currentStation.getPosition());
+        this.speedTab =  new SimpleDoubleProperty(currentSpeed);
+        this.brokenTab =  new SimpleStringProperty("" + broken);
+        
     }
      
     public boolean getBroken(){
@@ -99,7 +119,21 @@ public class Train implements Runnable{
         return currentStation;
     }
     
+    public SimpleIntegerProperty trainNumProperty(){
+        return this.trainNumTab;
+    }
     
+    public SimpleIntegerProperty stationNumProperty(){
+        return this.stationNumTab;
+    }
+    
+    public SimpleDoubleProperty speedProperty(){
+        return new SimpleDoubleProperty(currentSpeed);
+    }
+    
+    public SimpleStringProperty brokenProperty(){
+        return this.brokenTab;
+    }
     
     
     
@@ -111,7 +145,7 @@ public class Train implements Runnable{
         timeCounter = 0;
         
         //hier wird das verhalten eines zuges abgebildet 
-        while (true) {
+        while (running) {
             switch (state) {
             case DRIVING:
                 if (currentSpeed >= DRIVINGSPEED){
@@ -120,15 +154,15 @@ public class Train implements Runnable{
                     accelerate();
                     //System.err.println("accelerate....");
                 }
-                position.x = (position.x + (timeCounter)) % 588;
-                System.out.println(position.x);
+                position.x = position.x + (timeCounter);
+                //System.out.println(position.x);
                 timeCounter++;
                 
                 if (timeCounter >= nextStation.getDistance()) {
                     timeCounter = 0;
                     if (currentStation.isSignal() && !stationList.getNextStation(currentStation).getHasTrain()){
                         blockNextSegment();
-                        System.err.println("Green signal for traing " + trainNumber);
+                        System.err.println("Green signal for train before Station " + currentStation.getPosition());
                     }else{
                        currentSpeed = 0;
                        state = State.TrainState.STOP;
@@ -171,15 +205,19 @@ public class Train implements Runnable{
         }
         if(stationList.getIndexOf(nextStation) == 1){
             timeCounter = 0;
+            position.x = 0;
         }
         currentStation.setHasTrain(false);
         currentStation = nextStation;
+        currentStationNum = currentStation.getPosition();
         currentStation.setHasTrain(true);
         
         
     }
 
-    
+    public void terminate() {
+        running = false;
+    }
     
     
 }
