@@ -113,7 +113,7 @@ public class UBahn extends Application {
     
     public void stopTrain(String trainNum){
         int num = Integer.parseInt(trainNum);
-        System.err.println("Stopping trains with number " + num);
+        System.err.println("Stopping train with number " + num);
         
     }
 

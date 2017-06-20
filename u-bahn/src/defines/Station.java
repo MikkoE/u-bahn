@@ -26,7 +26,7 @@ public class Station {
        hasTrain = false;
        this.name = name;
        this.position = position;
-       this.distance = distance;
+       this.distance = 25;
        this.signal = signal;
     }
     
