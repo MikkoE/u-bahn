@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -27,7 +29,7 @@ import javafx.stage.Stage;
  */
 public class UBahn extends Application {
     
-    public static final int HEIGHT = 825;
+    public static final int HEIGHT = 1025;
     public static final int WIDTH = 500;
     
     public StationList stationList = new StationList();
@@ -40,12 +42,15 @@ public class UBahn extends Application {
     
     Gui gui;
     GuiTick guiTick;
+    Thread guiTickT;
+    
+    
  
     
     @Override
     public void start(Stage primaryStage) { 
         
-        initStations(startStation);
+        stationList.initStations(startStation);
           
         StackPane root = new StackPane();
         gui = new Gui(root, trainDataList, this);
@@ -73,27 +78,10 @@ public class UBahn extends Application {
         }
     }
 
-    private void initStations(Station startStation) {
-        Station s1 = startStation;
-        stationList.addStation(s1);
-        
-        Station s2 = new Station("2", 1, 7, true);
-        stationList.addStation(s2);
-        
-        Station s3 = new Station("3", 2, 9, false);
-        stationList.addStation(s3);
-        
-        Station s4 = new Station("4", 3, 14, true);
-        stationList.addStation(s4);
-        
-        Station s5 = new Station("5", 4, 10, false);
-        stationList.addStation(s5);
-        
-        Station s6 = new Station("6", 5, 11, true);
-        stationList.addStation(s6);
-    }
+    
     
     public void startTrains(String trainsNum){
+        guiTick.setSimulate(true);
         System.err.println("start  all trains");
         trainDataList.removeAll(trainDataList);
         trainList.removeAll(trainList);
@@ -101,9 +89,13 @@ public class UBahn extends Application {
         initTrains(startStation, trains);
         System.out.println(trainDataList);
         gui.getTable().setItems(trainDataList);
+        guiTickT = new Thread(guiTick);
+        guiTickT.start();
+        
     }
     
     public void stopSimulation() {
+        guiTick.setSimulate(false);
         System.err.println("Stopping simulation");
         for (int i = 0; i < trainList.size(); i++) {
             trainList.get(i).terminate();
@@ -113,8 +105,14 @@ public class UBahn extends Application {
     
     public void stopTrain(String trainNum){
         int num = Integer.parseInt(trainNum);
+        trainList.get(num-1).setBroken(true);
         System.err.println("Stopping train with number " + num);
         
+    }
+    
+    public void deleteTrain(String trainNum){
+        int num = Integer.parseInt(trainNum);
+        trainList.get(num-1).setBroken(false);
     }
 
     public ObservableList<Train> getTrainDataList() {

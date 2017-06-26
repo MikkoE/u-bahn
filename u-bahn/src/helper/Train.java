@@ -7,6 +7,8 @@ package helper;
 
 import defines.TrainPosition;
 import defines.Station;
+import gui.Gui;
+import java.beans.PropertyChangeSupport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -26,6 +28,8 @@ public class Train implements Runnable{
     public static final int DRIVINGTIME = 25;
     public static final int STOPTIME = 10;
     
+    private final PropertyChangeSupport propertySupport ;
+    
     private boolean broken;
     private int trainNumber;
     private Station currentStation;
@@ -38,9 +42,14 @@ public class Train implements Runnable{
     private final SimpleIntegerProperty stationNumTab;
     private final SimpleDoubleProperty speedTab;
     private final SimpleStringProperty brokenTab;
+    private final SimpleDoubleProperty timeTab;
     
     //counter für die strecke der bahn
     int timeCounter;
+    
+    //time val to approach
+    private double approachingTime = STOPTIME;
+    private double accelerate = 0;
     
     //position des Zuges
     private TrainPosition position;
@@ -51,7 +60,7 @@ public class Train implements Runnable{
     State.TrainState state;
     
     private volatile boolean running = true;
-
+    boolean start;
     
     
     /**
@@ -66,15 +75,20 @@ public class Train implements Runnable{
         this.currentStationNum = currentStation.getPosition();
         broken = false;
         position = new TrainPosition(1, 1);
-        currentSpeed = 0;
+        setSpeed(0);
         state = State.TrainState.STOP;
         this.stationList = stationList;
+        start = true;
+        
         
         //anzeige
         this.trainNumTab =  new SimpleIntegerProperty(trainNumber);
         this.stationNumTab =  new SimpleIntegerProperty(currentStation.getPosition());
         this.speedTab =  new SimpleDoubleProperty(currentSpeed);
         this.brokenTab =  new SimpleStringProperty("" + broken);
+        this.timeTab =  new SimpleDoubleProperty(approachingTime);
+        
+        this.propertySupport = new PropertyChangeSupport(this);
         
     }
      
@@ -101,11 +115,6 @@ public class Train implements Runnable{
     public void setCurrentSpeed(double currentSpeed) {
         this.currentSpeed = currentSpeed;
     }
-    
-    private void accelerate() {
-        currentSpeed += 1;
-        //System.err.println("Accelerate: " + currentSpeed);
-    }
 
     public TrainPosition getPosition() {
         return position;
@@ -128,11 +137,41 @@ public class Train implements Runnable{
     }
     
     public SimpleDoubleProperty speedProperty(){
-        return new SimpleDoubleProperty(currentSpeed);
+        return this.speedTab;
     }
     
     public SimpleStringProperty brokenProperty(){
         return this.brokenTab;
+    }
+    
+    public SimpleDoubleProperty timeProperty(){
+        return this.timeTab;
+    }
+
+    public double getApproachingTime() {
+        return approachingTime;
+    }
+
+    public void setApproachingTime(double approachingTime) {
+        double old = this.approachingTime ;
+        this.approachingTime = approachingTime;
+	propertySupport.firePropertyChange("approachingTime", old, approachingTime);
+    }
+
+    public int getStationNum() {
+        return currentStationNum;
+    }
+    
+    public void setStationNum(int stationNum){
+        currentStationNum = stationNum;
+    }
+
+    public double getSpeed() {
+        return currentSpeed;
+    }
+    
+    public void setSpeed(double speed){
+        currentSpeed = speed;
     }
     
     
@@ -146,27 +185,35 @@ public class Train implements Runnable{
         
         //hier wird das verhalten eines zuges abgebildet 
         while (running) {
+            if(!broken){
+                
             switch (state) {
             case DRIVING:
                 if (currentSpeed >= DRIVINGSPEED){
                     //System.err.println("Train " + trainNumber + " driving with max Speed");
                 }else{
-                    accelerate();
+                    //accelerate
+                    setSpeed(currentSpeed + accelerate);
                     //System.err.println("accelerate....");
                 }
                 position.x = position.x + (timeCounter);
                 //System.out.println(position.x);
                 timeCounter++;
+                setApproachingTime(approachingTime--);
+                //System.out.println("Train " + trainNumber + " approaching time :" + approachingTime);
                 
                 if (timeCounter >= nextStation.getDistance()) {
                     timeCounter = 0;
+                    
                     if (currentStation.isSignal() && !stationList.getNextStation(currentStation).getHasTrain()){
                         blockNextSegment();
+                        setApproachingTime(currentStation.getDistance());
                         System.err.println("Green signal for train before Station " + currentStation.getPosition());
                     }else{
                        currentSpeed = 0;
                        state = State.TrainState.STOP;
-                        System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
+                       approachingTime = STOPTIME;
+                       System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
                     }
                 }
                 
@@ -174,16 +221,19 @@ public class Train implements Runnable{
                     
             case STOP:
                 timeCounter++;
+                approachingTime--;
                 
-                
+                //System.out.println("Train " + trainNumber + " stoped time :" + approachingTime);
                 if (timeCounter >= STOPTIME) {
                     timeCounter = 0;
                     blockNextSegment();
+                    approachingTime = currentStation.getDistance();
                     state = State.TrainState.DRIVING;
+                    accelerate = Math.random() +0.5; 
+                    }
+                 break;
                 }
-                break;
             }
-            
             
             try {
                 Thread.sleep(TICK);
@@ -196,13 +246,18 @@ public class Train implements Runnable{
     private void blockNextSegment() { 
         nextStation = stationList.getNextStation(currentStation);
         
-        while (nextStation.getHasTrain()) {
+        while (nextStation.getHasTrain() && running) {
+            approachingTime -= 2;
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
+                if (!start){
+                    System.out.println("Train " + trainNumber + " waiting for free segment. Delayed: " +approachingTime);
+                }
             } catch (InterruptedException ex) {
                 Logger.getLogger(Train.class.getName()).log(Level.SEVERE, null, ex);
             } 
         }
+        start = false;
         if(stationList.getIndexOf(nextStation) == 1){
             timeCounter = 0;
             position.x = 0;
@@ -216,8 +271,11 @@ public class Train implements Runnable{
     }
 
     public void terminate() {
+        currentStation.setHasTrain(false);
         running = false;
     }
+    
+    
     
     
 }

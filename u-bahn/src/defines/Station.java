@@ -30,11 +30,11 @@ public class Station {
        this.signal = signal;
     }
     
-    public boolean getHasTrain(){
+    public synchronized boolean getHasTrain(){
         return hasTrain;
     }
     
-    public void setHasTrain(boolean hasTrain){
+    public synchronized void setHasTrain(boolean hasTrain){
         if (hasTrain){
             System.err.println("New Train Approaching at Station: " + position);
         }else{ 
