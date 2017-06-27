@@ -11,6 +11,8 @@ import gui.Gui;
 import gui.GuiTick;
 import static gui.GuiTick.TICK;
 import helper.Train;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,6 +103,18 @@ public class UBahn extends Application {
             trainList.get(i).terminate();
         }
         
+        
+        //Ausgabe der Distanz welche die züge gefahren sind im MAtlab format
+        try(  PrintWriter out = new PrintWriter( "trainDist"+ trainList.size() +".txt" )  ){
+    
+
+        for (int i = 0; i < trainList.size(); i++) {
+            System.out.println(trainList.get(i).distToString()); 
+            out.println(trainList.get(i).distToString());
+        }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(UBahn.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void stopTrain(String trainNum){

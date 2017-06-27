@@ -54,8 +54,8 @@ public class Gui {
     TableColumn trainNumberColumn = new TableColumn<>("Zugnummer");
     TableColumn currentStationColumn = new TableColumn<>("Aktuelle Station");
     TableColumn speedColumn = new TableColumn<>("Geschwindigkeit");
-    TableColumn brokenColumn = new TableColumn<>("Zustand");
-    TableColumn timeColumn = new TableColumn<Train, Double>("Zeitplan");
+    TableColumn brokenColumn = new TableColumn<>("Kaputt");
+    TableColumn timeColumn = new TableColumn<>("Zeitplan");
     
     ArrayList<TableColumn> columns = new ArrayList<>();
     

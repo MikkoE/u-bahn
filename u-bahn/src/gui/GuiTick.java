@@ -44,6 +44,7 @@ public class GuiTick implements Runnable{
     public void run() {
         while (simulate){
             guiTickT.run();
+            
             //System.out.println("Refresh Table!");
             try {
                 Thread.sleep(1000);

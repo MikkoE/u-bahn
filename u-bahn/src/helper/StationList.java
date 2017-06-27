@@ -55,33 +55,33 @@ public class StationList {
         
         this.addStation(new Station("6", 5, 11, true));
         
-        this.addStation(new Station("7", 5, 11, false));
+        this.addStation(new Station("7", 6, 11, false));
         
-        this.addStation(new Station("8", 5, 11, true));
+        this.addStation(new Station("8", 7, 11, true));
         
-        this.addStation(new Station("9", 5, 11, false));
+        this.addStation(new Station("9", 8, 11, false));
          
-        this.addStation(new Station("10", 5, 11, true));
+        this.addStation(new Station("10", 9, 11, true));
          
-        this.addStation(new Station("11", 5, 11, false));
+        this.addStation(new Station("11", 10, 11, false));
          
-        this.addStation(new Station("12", 5, 11, true));
+        this.addStation(new Station("12", 11, 11, true));
          
-        this.addStation(new Station("13", 5, 11, false));
+        this.addStation(new Station("13", 12, 11, false));
          
-        this.addStation(new Station("14", 5, 11, true));
+        this.addStation(new Station("14", 13, 11, true));
          
-        this.addStation(new Station("15", 5, 11, false));
+        this.addStation(new Station("15", 14, 11, false));
          
-        this.addStation(new Station("16", 5, 11, true)); 
+        this.addStation(new Station("16", 15, 11, true)); 
         
-        this.addStation(new Station("17", 5, 11, false)); 
+        this.addStation(new Station("17", 16, 11, false)); 
         
-        this.addStation(new Station("18", 5, 11, true));
+        this.addStation(new Station("18", 17, 11, true));
          
-        this.addStation(new Station("19", 5, 11, false));
+        this.addStation(new Station("19", 18, 11, false));
         
-        this.addStation(new Station("20", 5, 11, true));
+        this.addStation(new Station("20", 19, 11, true));
         
     }
     
