@@ -32,6 +32,7 @@ public class Train implements Runnable{
     private final PropertyChangeSupport propertySupport ;
     
     private ArrayList<Double> trainDist;
+    private ArrayList<Double> trainApproach;
     
     private boolean broken;
     private int trainNumber;
@@ -85,6 +86,7 @@ public class Train implements Runnable{
         this.stationList = stationList;
         start = true;
         trainDist = new ArrayList<>();
+        trainApproach = new ArrayList<>();
         
         
         //anzeige
@@ -211,7 +213,7 @@ public class Train implements Runnable{
                 //System.out.println(position.x);
                 timeCounter++;
                 
-                setApproachingTime(approachingTime--);
+                approachingTime--;
                 //System.out.println("Train " + trainNumber + " approaching time :" + approachingTime);
                 
                 if (timeCounter >= nextStation.getDistance()) {
@@ -248,7 +250,7 @@ public class Train implements Runnable{
             }else {
                 trainDist.add(dist);
             }
-            
+            trainApproach.add(approachingTime);
             try {
                 Thread.sleep(TICK);
             } catch (InterruptedException ex) {
@@ -267,6 +269,9 @@ public class Train implements Runnable{
                 Thread.sleep(250);
                 if (!start){
                     System.out.println("Train " + trainNumber + " waiting for free segment. Delayed: " +approachingTime);
+                    trainApproach.add(approachingTime);
+                }else{
+                    trainApproach.add(0.0);
                 }
             } catch (InterruptedException ex) {
                 Logger.getLogger(Train.class.getName()).log(Level.SEVERE, null, ex);
@@ -304,6 +309,19 @@ public class Train implements Runnable{
         }*/
         for (int i = 0; i < trainDist.size(); i++) {
            result += trainDist.get(i) + " ";
+        }
+        result += "];";
+        return result;
+    }
+    
+    public String approachToString(){
+        String result = "y" + trainNumber + " = [";
+        /*for (int i = 0; i < trainNumber; i++) {
+            result += "0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 ";
+            
+        }*/
+        for (int i = 0; i < trainApproach.size(); i++) {
+           result += trainApproach.get(i) + " ";
         }
         result += "];";
         return result;

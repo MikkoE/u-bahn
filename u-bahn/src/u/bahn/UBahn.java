@@ -115,6 +115,18 @@ public class UBahn extends Application {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(UBahn.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //Ausgabe des Delays in Datei schreiben
+        try(  PrintWriter out = new PrintWriter( "trainApproach"+ trainList.size() +".txt" )  ){
+    
+
+        for (int i = 0; i < trainList.size(); i++) {
+            System.out.println(trainList.get(i).approachToString()); 
+            out.println(trainList.get(i).approachToString());
+        }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(UBahn.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void stopTrain(String trainNum){
