@@ -38,6 +38,10 @@ public class StationList {
         return stationList;
     }
     
+    public int getSize(){
+        return stationList.size();
+    }
+    
     public int getIndexOf(Station station){
         return stationList.indexOf(station);
     }   

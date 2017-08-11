@@ -55,6 +55,7 @@ public class Train implements Runnable{
     //time val to approach
     private double approachingTime = STOPTIME;
     private double accelerate = 0;
+    private int driveTime = 0;
     
     //position des Zuges
     private TrainPosition position;
@@ -81,7 +82,7 @@ public class Train implements Runnable{
         this.currentStationNum = currentStation.getPosition();
         broken = false;
         position = new TrainPosition(1, 1);
-        setSpeed(0);
+        this.setSpeed(0);
         state = State.TrainState.STOP;
         this.stationList = stationList;
         start = true;
@@ -201,11 +202,11 @@ public class Train implements Runnable{
             
             switch (state) {
             case DRIVING:
-                if (currentSpeed >= DRIVINGSPEED){
-                    //System.err.println("Train " + trainNumber + " driving with max Speed");
-                }else{
+                if (currentSpeed < DRIVINGSPEED){
                     //accelerate
-                    setSpeed(currentSpeed + accelerate);
+                    
+                    setSpeed(accelerate * driveTime + currentSpeed);
+                    driveTime++;
 
                     //System.err.println("accelerate....");
                 }
@@ -237,13 +238,22 @@ public class Train implements Runnable{
                 timeCounter++;
                 approachingTime--;
                 
+                //wenn der zug verspätung hat wartezeit verkürzen
+                if (approachingTime < 0){
+                    timeCounter += 3;
+                }
+                
                 //System.out.println("Train " + trainNumber + " stoped time :" + approachingTime);
                 if (timeCounter >= STOPTIME) {
                     timeCounter = 0;
                     blockNextSegment();
-                    approachingTime = currentStation.getDistance();
+                    approachingTime = approachingTime + currentStation.getDistance();
                     state = State.TrainState.DRIVING;
-                    accelerate = Math.random() +0.5; 
+                    accelerate = Math.random() + 0.5;
+                    if (approachingTime < 0){
+                        accelerate = accelerate + 0.2;
+                    }
+                    driveTime = 0;
                     }
                  break;
                 }

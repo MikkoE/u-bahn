@@ -9,7 +9,6 @@ import helper.StationList;
 import defines.Station;
 import gui.Gui;
 import gui.GuiTick;
-import static gui.GuiTick.TICK;
 import helper.Train;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -17,10 +16,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -66,9 +63,18 @@ public class UBahn extends Application {
     }
 
     private void initTrains(Station startStation, int trainsNum) {
-        Train train;
         for (int i = 0; i < trainsNum; i++) {
-            train = new Train(i, startStation, stationList);
+            newTrain(i, stationList.getNextStation(startStation));
+            int next = stationList.getSize()/trainsNum;
+            for (int j = next; j > 0; j--) {
+                startStation = stationList.getNextStation(startStation);
+            }
+            
+        }
+    }
+    
+    private void newTrain(int trainNum, Station station){
+        Train train = new Train(trainNum, station, stationList);
             trainList.add(train);
             new Thread(train).start();
             trainDataList.add(train);
@@ -77,7 +83,6 @@ public class UBahn extends Application {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Train.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
     }
 
     
@@ -132,7 +137,7 @@ public class UBahn extends Application {
     public void stopTrain(String trainNum){
         int num = Integer.parseInt(trainNum);
         trainList.get(num-1).setBroken(true);
-        System.err.println("Stopping train with number " + num);
+        System.err.println("Stopping train number " + num);
         
     }
     
