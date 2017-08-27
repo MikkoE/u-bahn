@@ -7,7 +7,6 @@ package helper;
 
 import defines.TrainPosition;
 import defines.Station;
-import gui.Gui;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -15,6 +14,8 @@ import java.util.logging.Logger;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+
 
 /**
  *
@@ -209,6 +210,8 @@ public class Train implements Runnable{
                     driveTime++;
 
                     //System.err.println("accelerate....");
+                }else{
+                    driveTime++;
                 }
                 position.x = position.x + (timeCounter);
                 //System.out.println(position.x);
@@ -217,6 +220,26 @@ public class Train implements Runnable{
                 approachingTime--;
                 //System.out.println("Train " + trainNumber + " approaching time :" + approachingTime);
                 
+                if (timeCounter >= (nextStation.getDistance() - 1)){
+                    state = State.TrainState.BREAKING;
+                   
+                    
+                }
+                
+                break;
+            case BREAKING:
+                
+                position.x = position.x + (timeCounter);
+                timeCounter++;
+                approachingTime--;
+                driveTime++;
+                if (timeCounter >= (nextStation.getDistance() - 10) && timeCounter < (nextStation.getDistance() - 5) && !stationList.getNextStation(currentStation).getHasTrain()){
+                    setSpeed(currentSpeed - 2);
+                }else if(timeCounter >= (nextStation.getDistance() - 5)&& !stationList.getNextStation(currentStation).getHasTrain()){
+                    setSpeed(currentSpeed - 2);
+                }
+                    
+                    
                 if (timeCounter >= nextStation.getDistance()) {
                     timeCounter = 0;
                     
@@ -225,13 +248,12 @@ public class Train implements Runnable{
                         setApproachingTime(currentStation.getDistance());
                         System.err.println("Green signal for train before Station " + currentStation.getPosition());
                     }else{
-                       currentSpeed = 0;
-                       state = State.TrainState.STOP;
-                       approachingTime = STOPTIME;
-                       System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
+                        currentSpeed = 0;
+                        state = State.TrainState.STOP;
+                        approachingTime = STOPTIME;
+                        System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
                     }
                 }
-                
                 break;
                     
             case STOP:

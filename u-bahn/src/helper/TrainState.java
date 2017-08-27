@@ -11,6 +11,6 @@ package helper;
  */
 class State {
     public enum TrainState{
-        STOP, DRIVING
+        STOP, DRIVING, BREAKING
     }
 }

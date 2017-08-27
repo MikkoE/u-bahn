@@ -63,7 +63,8 @@ public class UBahn extends Application {
     }
 
     private void initTrains(Station startStation, int trainsNum) {
-        for (int i = 0; i < trainsNum; i++) {
+        newTrain(0, startStation);
+        for (int i = 1; i < trainsNum; i++) {
             newTrain(i, stationList.getNextStation(startStation));
             int next = stationList.getSize()/trainsNum;
             for (int j = next; j > 0; j--) {

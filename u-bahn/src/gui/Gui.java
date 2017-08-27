@@ -41,13 +41,13 @@ public class Gui {
             "10", "15", "20", "25", "30", "40", "50"
     );
     
-    Button startButton = new Button("Start new Simulation");
-    Button stopButton = new Button("Stop current Simulation");
-    Button stopTrainButton = new Button ("Stop Train");
+    Button startButton = new Button("Starte neue Simulation");
+    Button stopButton = new Button("Stop aktuelle Simulation");
+    Button stopTrainButton = new Button ("Stop Zug");
     Button resetButton = new Button( "Reset");
-    Button deleteButton = new Button( "Repair Train");
+    Button deleteButton = new Button( "Repariere Zug");
     
-    Label trainsLabel = new Label("Anzah Züge:");
+    Label trainsLabel = new Label("Anzahl Züge:");
     
     TableView<Train> table = new TableView<>();
     
