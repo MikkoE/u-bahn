@@ -65,11 +65,12 @@ public class UBahn extends Application {
     private void initTrains(Station startStation, int trainsNum) {
         newTrain(0, startStation);
         for (int i = 1; i < trainsNum; i++) {
-            newTrain(i, stationList.getNextStation(startStation));
-            int next = stationList.getSize()/trainsNum;
-            for (int j = next; j > 0; j--) {
-                startStation = stationList.getNextStation(startStation);
-            }
+            int next = (stationList.getSize()/trainsNum);
+            //System.out.println("Züge: " + stationList.getSize() + " Anzahl: " + trainsNum + " Next: " + next);
+            int k = (next * i) +1;
+            Station station = stationList.getStation(k);
+            newTrain(i, stationList.getNextStation(station));
+            //System.out.println("set train on station number: " + k);
             
         }
     }

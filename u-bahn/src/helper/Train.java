@@ -245,12 +245,12 @@ public class Train implements Runnable{
                     
                     if (currentStation.isSignal() && !stationList.getNextStation(currentStation).getHasTrain()){
                         blockNextSegment();
-                        setApproachingTime(currentStation.getDistance());
+                        setApproachingTime( approachingTime + currentStation.getDistance());
                         System.err.println("Green signal for train before Station " + currentStation.getPosition());
                     }else{
                         currentSpeed = 0;
                         state = State.TrainState.STOP;
-                        approachingTime = STOPTIME;
+                        approachingTime =  approachingTime + STOPTIME;
                         System.err.println("Train " + trainNumber + " Stoped at Station " + currentStation.getPosition());
                     }
                 }
@@ -281,6 +281,7 @@ public class Train implements Runnable{
                 }
             }else {
                 trainDist.add(dist);
+                --approachingTime;
             }
             trainApproach.add(approachingTime);
             try {
@@ -295,10 +296,10 @@ public class Train implements Runnable{
         nextStation = stationList.getNextStation(currentStation);
         
         while (nextStation.getHasTrain() && running) {
-            approachingTime -= 2;
+            approachingTime--;
             trainDist.add(dist);
             try {
-                Thread.sleep(250);
+                Thread.sleep(TICK);
                 if (!start){
                     System.out.println("Train " + trainNumber + " waiting for free segment. Delayed: " +approachingTime);
                     trainApproach.add(approachingTime);

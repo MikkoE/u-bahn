@@ -88,6 +88,10 @@ public class StationList {
         this.addStation(new Station("20", 19, 11, true));
         
     }
+    public Station getStation(int index){
+        return stationList.get(index);
+    } 
+    
     
     
     
